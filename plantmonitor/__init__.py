@@ -26,12 +26,26 @@ def create_app():
 
     @app.route('/')
     def main():
-        data = requests.get(nodeurl(1))
-        moisture = data.json()['relative'] * 100
-        return render_template('base.html', moisture=moisture)
+        plants = Plant.query.all()
+        return render_template('landing.html', plants=plants)
 
     @app.route('/graph/<int:plant_id>')
-    def graph(plant_id):
+    @app.route('/graph/<int:plant_id>/<int:type_id>')
+    def graph(plant_id, type_id=1):
+        plant = Plant.query.get(plant_id)
+        type_ = MMType.query.get(type_id)
+        moisture = requests.get(nodeurl(plant.node_id)).json()['relative'] * 100
+        indicator = [{
+            'domain': { 'x': [0, 1], 'y': [0, 1] },
+            'value': moisture,
+            'title': { 'text': 'aktueller Wert' },
+            'type': "indicator",
+            'mode': "gauge+number",
+            #'delta': { 'reference': 100 },
+            'gauge': { 'axis': { 'range': [None, 100] } },
+            'number': { 'suffix': "%" }
+        }]
+        indicator = json.dumps(indicator, cls=plotly.utils.PlotlyJSONEncoder)
         data = Point.query.filter_by(plant_id=plant_id).order_by(Point.time).all()
         chart = [{
             'x': [point.time for point in data],
@@ -39,7 +53,7 @@ def create_app():
             'type': 'scatter'
         }]
         chart = json.dumps(chart, cls=plotly.utils.PlotlyJSONEncoder)
-        return render_template('graph.html', chart=chart)
+        return render_template('graph.html', chart=chart, plant=plant, type=type_, indicator=indicator)
 
     @app.route('/getmeta/<int:node_id>')
     def meta(node_id):

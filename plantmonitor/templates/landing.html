@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% for plant in plants %}
+<div>
+    <a href="/graph/{{ plant.id }}">{{ plant.name }}</a>
+</div>
+{% endfor %}
+
+{% endblock %}
