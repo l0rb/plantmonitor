@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    </head>
+</html>
+<body>
+    <div id="humid"></div>
+
+
+
+
+    <script type="text/javascript">
+
+        var data = [
+            {
+                domain: { x: [0, 1], y: [0, 1] },
+                value: {{ moisture }},
+                title: { text: "Efeutopf Feuchtigkeit" },
+                type: "indicator",
+                mode: "gauge+number",
+                //delta: { reference: 100 },
+                gauge: { axis: { range: [null, 100] } },
+                number: { suffix: "%" }
+            }
+        ];
+
+        var layout = { width: 600, height: 400 };
+
+        Plotly.newPlot('humid', data, layout);
+
+    </script>
+
+</body>
+</html>

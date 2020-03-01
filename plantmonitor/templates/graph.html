@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    </head>
+</html>
+<body>
+    <div id="humid"></div>
+
+
+
+
+    <script type="text/javascript">
+
+        var data = {{chart | safe}};
+
+        var layout = {
+            autosize: true,
+            yaxis: {
+                title: 'Feuchtigkeit',
+                automargin: true
+            }
+        };
+
+        Plotly.newPlot('humid', data, layout);
+
+    </script>
+
+</body>
+</html>
+
