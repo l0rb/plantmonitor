@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import plotly
 import requests
@@ -7,6 +7,7 @@ from flask import Flask, session, g, redirect, url_for, render_template
 from flask_migrate import Migrate
 from flask_debugtoolbar import DebugToolbarExtension
 from bind import bind
+from sqlalchemy import and_
 
 from config import conf, nodeurl
 from .db import db, Plant, MMType, Point
@@ -81,6 +82,10 @@ def create_app():
 
     @app.route('/fetch/<int:node_id>')
     def fetch(node_id):
+        two_hour_ago = datetime.now() - timedelta(minutes=120) # there are still some timezone issues between the nodes and the monitor server
+        checkpoint = Point.query.filter(and_(Point.time >= two_hour_ago, Point.node_id==node_id)).first()
+        if checkpoint:
+            return f'Last point is not old enough to allow fetch: {datetime.now() - checkpoint.time}'
         try:
             data_response = requests.get(bind([nodeurl(node_id),'data'], safe='/:[]'))
         except requests.exceptions.ConnectionError:
@@ -102,7 +107,7 @@ def create_app():
             counter += 1
         db.session.commit()
         return f'{counter} datapoints added'
-    
+
     return app
 
 

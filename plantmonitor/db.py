@@ -48,6 +48,9 @@ class Point(db.Model):
     plant = relationship("Plant", back_populates="points")
     mm_type = relationship("MMType", back_populates="points")
 
+    def __str__(self):
+        return f'[Point {self.time} {self.value}]'
+
 Plant.points = relationship("Point", back_populates="plant")
 MMType.points = relationship("Point", back_populates="mm_type")
 
