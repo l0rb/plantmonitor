@@ -30,7 +30,14 @@
             automargin: true,
             tickformat: '.1%',
             rangemode: 'tozero',
-        }
+        },
+        yaxis2: {
+            automargin: true,
+            tickformat: '.1',
+            rangemode: 'tozero',
+            overlaying: 'y',
+            side: 'right',
+        },
     };
     Plotly.newPlot('line', data_l, layout_l);
 

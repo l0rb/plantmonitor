@@ -48,11 +48,29 @@ def create_app():
         }]
         indicator = json.dumps(indicator, cls=plotly.utils.PlotlyJSONEncoder)
         data = Point.query.filter_by(plant_id=plant_id).order_by(Point.time).all()
-        chart = [{
-            'x': [point.time for point in data],
-            'y': [point.value for point in data],
-            'type': 'scatter'
-        }]
+        chart = [
+            {
+                'x': [point.time for point in data if point.type_id==type_id],
+                'y': [point.value for point in data if point.type_id==type_id],
+                'name': type_.name,
+                'yaxis': 'y1',
+                'type': 'scatter'
+            },
+            {
+                'x': [point.time for point in data if point.type_id==2],
+                'y': [point.value for point in data if point.type_id==2],
+                'name': 'Temperatur',
+                'yaxis': 'y2',
+                'type': 'scatter'
+            },
+            {
+                'x': [point.time for point in data if point.type_id==3],
+                'y': [point.value/100 for point in data if point.type_id==3],
+                'name': 'Luftfeucht.',
+                'yaxis': 'y1',
+                'type': 'scatter'
+            },
+        ]
         chart = json.dumps(chart, cls=plotly.utils.PlotlyJSONEncoder)
         return render_template('graph.html', chart=chart, plant=plant, type=type_, indicator=indicator)
 
@@ -101,6 +119,7 @@ def create_app():
                 continue
             plant = Plant.query.filter_by(node_id=node_id, node_entity_id=point['plant']).first()
             type_ = MMType.query.filter_by(node_id=node_id, node_entity_id=point['type']).first()
+            # todo: if type unknow, do one fetch-meta
             point['time'] = datetime.fromisoformat(point['time'])
             model = Point(**fields, plant_id=plant.id, type_id=type_.id, value=point['value'], time=point['time'])
             db.session.add(model)
