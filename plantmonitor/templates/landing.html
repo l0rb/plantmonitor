@@ -3,7 +3,7 @@
 
 {% for plant in plants %}
 <div>
-    <a href="/graph/{{ plant.id }}">{{ plant.name }}</a>
+    <a href="{{ url_for('graph', plant_id=plant.id) }}">{{ plant.name }}</a>
 </div>
 {% endfor %}
 
