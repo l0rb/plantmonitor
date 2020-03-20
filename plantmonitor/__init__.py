@@ -35,7 +35,12 @@ def create_app():
     def graph(plant_id, type_id=1):
         plant = Plant.query.get(plant_id)
         type_ = MMType.query.get(type_id)
-        moisture = requests.get(nodeurl(plant.node_id)).json()['relative'] * 100
+        moisture_list = requests.get(nodeurl(plant.node_id)).json()
+        moisture = -1
+        for m in moisture_list:
+            if m.plant_id==plant_id:
+                moisture = m.relative * 100
+                break
         indicator = [{
             'domain': { 'x': [0, 1], 'y': [0, 1] },
             'value': moisture,
