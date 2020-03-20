@@ -38,8 +38,8 @@ def create_app():
         moisture_list = requests.get(nodeurl(plant.node_id)).json()
         moisture = -1
         for m in moisture_list:
-            if m.plant_id==plant_id:
-                moisture = m.relative * 100
+            if m['plant_id']==plant_id:
+                moisture = m['relative'] * 100
                 break
         indicator = [{
             'domain': { 'x': [0, 1], 'y': [0, 1] },
