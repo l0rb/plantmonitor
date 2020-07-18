@@ -7,7 +7,7 @@ from flask import Flask, session, g, redirect, url_for, render_template
 from flask_migrate import Migrate
 from flask_debugtoolbar import DebugToolbarExtension
 from bind import bind
-from sqlalchemy import and_
+from sqlalchemy import and_, desc
 
 from config import conf, nodeurl
 from .db import db, Plant, MMType, Point
@@ -109,8 +109,10 @@ def create_app():
         checkpoint = Point.query.filter(and_(Point.time >= two_hour_ago, Point.node_id==node_id)).first()
         if checkpoint:
             return f'Last point is not old enough to allow fetch: {datetime.now() - checkpoint.time}'
+        latest = Point.query.order_by(desc('time')).first()
+        start = str(int(latest.time.timestamp() - 12*3600)) # add 12 hours of overlap when fetching data
         try:
-            data_response = requests.get(bind([nodeurl(node_id),'data'], safe='/:[]'))
+            data_response = requests.get(bind([nodeurl(node_id),'data'], safe='/:[]'), params={'start':start})
         except requests.exceptions.ConnectionError:
             return 'ConnectionError when requesting node. Maybe node_id is wrong?'
         data = data_response.json()
